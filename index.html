@@ -1,0 +1,387 @@
+
+  <!doctype html>
+  <html>
+
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <title>Chat</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+      integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <link rel="icon" type="image/png" href="https://img.icons8.com/flat_round/64/000000/filled-chat.png" />
+    <link href="https://fonts.googleapis.com/css?family=Montserrat|Noto+Sans&display=swap" rel="stylesheet">
+
+    <!-- <link rel="stylesheet" type="text/css" media="screen" href="style.css"> -->
+
+
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        /* font: 13px Helvetica, Arial; */
+        font-family: 'Montserrat', sans-serif;
+      }
+
+
+      #messages {
+        list-style-type: none;
+        margin: 0;
+        padding: 0;
+      }
+
+      #messages li {
+        padding: 5px 10px;
+      }
+
+      #messages li:nth-child(odd) {
+        background: #eee;
+      }
+
+      #messages {
+        margin-bottom: 40px
+      }
+
+      /* .chat-area{
+      display: flex;
+      flex-direction: row;
+    } */
+
+      .col-md-4 {
+        background-color: white;
+      }
+
+      .col-md-8 {
+        background-color: white;
+      }
+
+      input {
+        outline: none;
+      }
+
+      .form-control:focus {
+        border-color: none !important;
+        box-shadow: none !important;
+        outline: none !important;
+      }
+
+
+      .footer {
+        position: fixed;
+        /* left: auto; */
+
+        bottom: 0;
+        width: 65%;
+        background-color: none;
+        color: white;
+        text-align: center;
+      }
+
+      .flex-container {
+        display: flex;
+        flex-direction: column-reverse;
+      }
+
+      /* Extend columns to bottom of screen  */
+      .col-md-4 {
+        padding-bottom: 100%;
+        margin-bottom: -100%;
+
+      }
+
+      .col-md-8 {
+        padding-bottom: 100%;
+        margin-bottom: -100%;
+        /* position: fixed; */
+        /* height: 40px;  */
+
+        /* height:400px; 
+      overflow-y:scroll; 
+      background:red; */
+
+      }
+
+      .jumbotron {
+        margin-top: 5px;
+      }
+
+      p {
+        font-size: 12px;
+      }
+
+
+      .scrollable {
+        height: 450px;
+        overflow-y: scroll;
+        /* background:lightblue; */
+      }
+
+      html,
+      body {
+        margin: 0;
+        height: 100%;
+        overflow: hidden
+      }
+    </style>
+
+  </head>
+
+  <body>
+    <div class="container-fluid flex-container">
+      <div class="row">
+        <div class="col-md-4">
+          <div class="jumbotron scrollable">
+            <h2>Users Online</h2>
+            <ul id="usersOnline"></ul>
+
+          </div>
+
+
+        </div>
+
+        <div class="col-md-8">
+          <h1> Chat </h1>
+          <p> <b>To switch nicknames type: /nick new_nickname </b>
+            <br>
+            <b>To switch color: /nickcolor RRGGBB </b> </p>
+          </p>
+          <!-- <p> Valid Commands: To switch color: /nickcolor rgb(a,b,c) where a, b, c are integers from 0 to 255 </p> -->
+          <div class="chat-area">
+            <div class="flex-container scrollable msgbox">
+              <ul id="messages"></ul>
+            </div>
+            <div class="input-box">
+
+
+              <!-- <form class = "form-inline" action="">
+              <input id="m" autocomplete="off" /><button>Send</button>
+
+            </form> -->
+              <form>
+                <div class="input-group mt-auto footer mb-3">
+                  <input id="m" type="text" action="" class="form-control" placeholder="Enter Message">
+                  <div class="input-group-append">
+                    <button class="btn btn-dark" type="button">Send</button>
+                  </div>
+
+                </div>
+
+              </form>
+
+
+            </div>
+
+          </div>
+
+
+
+        </div>
+      </div>
+    </div>
+
+
+
+
+
+    <!-- <div class="chat-area">
+    <ul id="messages"></ul>
+    <form action="">
+      <input id="m" autocomplete="off" /><button>Send</button>
+    </form>
+  </div> -->
+
+    <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
+    <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
+    <!-- <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+    integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous">
+  </script> -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+      integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous">
+    </script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+      integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous">
+    </script>
+    <!-- <script src="script.js"></script> -->
+
+    <script>
+      // Client side of the Chatting Application 
+
+      // $(document).ready(function(){
+
+      $(function () {
+        var socket = io();
+        console.log(document.cookie);
+
+        socket.emit("appState");
+
+
+        // for the current session get the cookie here 
+        let userName = getCookie("uname");
+        if (userName === "") {
+          console.log("cookie not found");
+          socket.emit('newUser');
+        }
+
+
+        console.log(document.cookie);
+        $('form').submit(function (w) {
+          w.preventDefault();
+          // When the submit is clicked get the message from id
+
+          socket.emit('chat message', $('#m').val(), userName);
+          $('#m').val('');
+          return false;
+        });
+
+
+        // socket.on('check user', function(){
+        //   let name = document.cookie; 
+
+        //   if(name == ""){
+        //     // make new user 
+
+        //   }
+
+        // });
+
+
+        socket.on('chat message', function (msg, userColor, user) {
+
+          // console.log("here to append stuff"); 
+          // $('#messages').append($('<li>').text(msg));
+          if (!(userName === user)) {
+            console.log("not bold" + userName + "user" + user);
+            $('#messages').append($('<li>').html('<span style="color:#' + userColor + ' ">' + msg + '</span>'));
+          } else {
+            console.log("bold");
+            $('#messages').append($('<li>').html('<span style="color:#' + userColor + ' ">' + "<b>" + msg +
+              "</b>" + '</span>'));
+          }
+
+          $('.msgbox').animate({
+            scrollTop: $('.msgbox').prop("scrollHeight")
+          }, 600);
+
+
+          // window.scrollTo(0, document.body.scrollHeight);
+        });
+
+
+
+
+
+        socket.on("appState", function (msgs, users) {
+          console.log("in client app state" + userName + "Length of Users" + users.length);
+          for (let i = 0; i < msgs.length; i++) {
+
+            if (!(msgs[i].uname === userName)) {
+              //console.log("printing regular");
+              // belonging to the user, then bold them
+              $('#messages').append($('<li>').html('<span style="color:#' + msgs[i].color + ' ">' + (msgs[i]
+                .time +
+                " - " + msgs[i].uname + ": " + msgs[i].msg) + '</span>'));
+            } else {
+              // not belonging to the user, won't be bolded 
+              //console.log("Printing the bolderd");
+              $('#messages').append($('<li>').html('<span style="color:#' + msgs[i].color + ' ">' + "<b>" + (
+                msgs[i]
+                .time + " - " + msgs[i].uname + ": " + msgs[i].msg) + "</b>" + '</span>'));
+            }
+
+
+          }
+
+          $('.msgbox').animate({
+            scrollTop: $('.msgbox').prop("scrollHeight")
+          }, 600);
+
+          console.log(users.length);
+          users.map(function (u) {
+            console.log("trying to fill up user names" + u.uname);
+            if (typeof u.uname !== 'undefined') {
+              $('#usersOnline').append($('<li>').text(u.uname));
+            }
+
+          });
+
+        })
+
+
+
+
+        socket.on('newUser', function (newName) {
+          //setCookie("uname", newName);
+          document.cookie = "uname" + " = " + newName + ";";
+          console.log("new Name is made" + newName)
+          $('#usersOnline').append($('<li>').text(newName));
+          // $('#usersOnline').append($('<li>').text(newName));
+          userName = newName;
+
+
+        });
+
+
+
+        socket.on('nickChange', function (nick) {
+          //setCookie("uname", newName);
+
+          document.cookie = "uname" + "=" + nick + ";";
+          userName = nick;
+
+
+
+        });
+
+        socket.on('updateUserList', function (usersList) {
+          //setCookie("uname", newName);
+          $('#usersOnline').empty();
+          usersList.map(function (u) {
+            console.log("trying to fill up user names" + u.uname);
+            if (typeof u.uname !== 'undefined') {
+              $('#usersOnline').append($('<li>').text(u.uname));
+            }
+
+          });
+
+
+
+        });
+
+
+
+
+      });
+
+
+
+      function getCookie(uname) {
+        // Reference: https://www.w3schools.com/js/js_cookies.asp 
+        // How to get a cookie in javascript 
+
+        let find = uname + "=";
+        // var decodedCookie = decodeURIComponent(document.cookie);
+        let data = document.cookie.split(';');
+        for (let i = 0; i < data.length; i++) {
+          var cookieItem = data[i];
+          while (cookieItem.charAt(0) == ' ') {
+            cookieItem = cookieItem.substring(1);
+          }
+          if (cookieItem.indexOf(find) == 0) {
+            return cookieItem.substring(find.length, cookieItem.length);
+          }
+        }
+
+
+        return "";
+      }
+
+
+
+
+    </script>
+  </body>
+
+  </html>
